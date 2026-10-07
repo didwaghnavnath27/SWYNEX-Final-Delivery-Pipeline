@@ -1,0 +1,31 @@
+name: Final Delivery Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deliver:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t swynex-final-delivery .
+
+      - name: Test Docker image
+        run: docker run -d -p 8080:80 --name swynex-test swynex-final-delivery
+
+      - name: Verify website
+        run: |
+          sleep 5
+          curl --fail http://localhost:8080
+
+      - name: Stop test container
+        run: docker stop swynex-test
+
+      - name: Delivery completed
+        run: echo "Build, test and delivery completed successfully!"
